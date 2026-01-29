@@ -342,6 +342,36 @@
     .recommendation-card h4 {
       color: var(--primary);
       margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .priority-badge {
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .priority-critical {
+      background: var(--dark-red);
+      color: white;
+    }
+    
+    .priority-high {
+      background: var(--orange);
+      color: white;
+    }
+    
+    .priority-medium {
+      background: #ffc107;
+      color: #333;
+    }
+    
+    .priority-low {
+      background: #4caf50;
+      color: white;
     }
     
     .recommendation-card ul {
@@ -351,6 +381,7 @@
     
     .recommendation-card li {
       margin-bottom: 0.5rem;
+      padding: 0.2rem 0;
     }
     
     .download-section {
@@ -363,9 +394,9 @@
     .no-recommendations {
       text-align: center;
       padding: 3rem;
-      background: #f9f9f9;
+      background: #f8f9fa;
       border-radius: 10px;
-      margin: 2rem 0;
+      margin-top: 2rem;
     }
     
     .no-recommendations h3 {
@@ -2042,47 +2073,54 @@
         </div>
       </div>
 
-<!-- Results page -->
-  <div id="results" class="q-box" style="display:none;">
-    <div class="results-summary">
-      <div class="q-header">Your Cyber Security Maturity Results</div>
-      <div class="overall-score" id="overall-score">0%</div>
-      <div class="maturity-level" id="maturity-level">Calculating...</div>
-    </div>
-    
-    <h3 style="margin: 2rem 0 1rem;">Detailed Assessment Results</h3>
-    <table class="pillars-table" id="pillars-table">
-      <thead>
-        <tr>
-          <th>Security Pillar</th>
-          <th>Your Score</th>
-          <th>Maximum Score</th>
-          <th>Maturity %</th>
-          <th>Progress</th>
-        </tr>
-      </thead>
-      <tbody id="pillars-body">
-        <!-- Will be populated by JavaScript -->
-      </tbody>
-    </table>
-    
-    <div class="recommendations">
-      <h2 style="text-align:center; margin-bottom:2rem;">Recommendations</h2>
-      <div id="recommendations-container">
-        <!-- Will be populated by JavaScript -->
-      </div>
-    </div>
-    
-    <div class="download-section">
-      <div class="btn-box-wrap" style="justify-content: center;">
-        <button class="button" onclick="location.reload()">Retake Assessment</button>
-        <button class="pdf-button" id="pdfBtn" onclick="generatePDF()">Download PDF Report</button>
+      <!-- Results page -->
+      <div id="results" class="q-box" style="display:none;">
+        <div class="results-summary">
+          <div class="q-header">Your Cyber Security Maturity Results</div>
+          <div class="overall-score" id="overall-score">0%</div>
+          <div class="maturity-level" id="maturity-level">Calculating...</div>
+        </div>
+        
+        <h3 style="margin: 2rem 0 1rem;">Detailed Assessment Results</h3>
+        <table class="pillars-table" id="pillars-table">
+          <thead>
+            <tr>
+              <th>Security Pillar</th>
+              <th>Your Score</th>
+              <th>Maximum Score</th>
+              <th>Maturity %</th>
+              <th>Progress</th>
+            </tr>
+          </thead>
+          <tbody id="pillars-body">
+            <!-- Will be populated by JavaScript -->
+          </tbody>
+        </table>
+        
+        <div class="recommendations">
+          <h2 style="text-align:center; margin-bottom:2rem;" id="recommendations-header">Recommendations</h2>
+          <div id="no-recommendations" class="no-recommendations" style="display:none;">
+            <h3>🎉 Excellent Security Posture!</h3>
+            <p>Congratulations! Your organization has achieved 100% maturity across all security pillars.</p>
+            <p>Continue with regular security assessments and stay updated with emerging threats.</p>
+          </div>
+          <div class="recommendations-grid" id="recommendations-grid">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        
+        <div class="download-section">
+          <div class="btn-box-wrap" style="justify-content: center;">
+            <button class="button" onclick="location.reload()">Retake Assessment</button>
+            <button class="pdf-button" id="pdfBtn" onclick="generatePDF()">Download PDF Report</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Scoring configuration (same as before)
+    // Scoring configuration
     const scoringConfig = {
       q1: {
         maxScore: 50,
@@ -2100,10 +2138,338 @@
           'Network Traffic Analysis (NTA)': 5
         }
       },
-      // ... (all other scoring config remains the same)
+      q2: {
+        maxScore: 10,
+        pillar: 'Network Security',
+        answers: {
+          'We use a fully scalable, elastic security solution that dynamically adds capacity (e.g., cloud-like auto-scaling firewalls or security fabric)': 10,
+          'We use clustering or load balancing across multiple fixed security appliances from a single vendor': 6,
+          'We manually purchase and deploy additional firewalls/appliances when capacity is reached': 3,
+          'We do not have a scalable approach — capacity is fixed and often becomes a bottleneck': 0
+        }
+      },
+      q3: {
+        maxScore: 5,
+        pillar: 'Network Security',
+        answers: {
+          'Active-active firewalls are deployed from a single vendor': 5,
+          'Active-passive firewalls are deployed in highly available clusters': 2,
+          'Firewalls with load balancers from another vendor are deployed': 2,
+          'Not sure': 0
+        }
+      },
+      q4: {
+        maxScore: 25,
+        pillar: 'Network Security',
+        answers: {
+          'Software-defined Networking': 5,
+          'Agile and automated policy': 5,
+          'Business logic policy': 5,
+          'Service chaining using NSX/Cisco/ACI/OpenStack': 5,
+          'Dedicated policy layers': 5,
+          'Not sure': 0
+        }
+      },
+      q5: {
+        maxScore: 40,
+        pillar: 'Network Security',
+        answers: {
+          'Sandboxing': 5,
+          'Next Generation Web Application Firewall': 5,
+          'Cloud-native vulnerability scanning': 5,
+          'Real-time threat intelligence to prevent zero-day attacks': 5,
+          'Kubernetes runtime security': 5,
+          'Anti-malware': 5,
+          'File sanitization (CDR)': 5,
+          'Malware DNA': 5,
+          'Not sure': 0
+        }
+      },
+      q6: {
+        maxScore: 20,
+        pillar: 'Workspace Security',
+        answers: {
+          'Posture management': 5,
+          'Threat prevention': 5,
+          'Vulnerability scanning': 5,
+          'Least privileged access': 5,
+          'Not using cloud for workloads': 0,
+          'Not sure': 0
+        }
+      },
+      q7: {
+        maxScore: 15,
+        pillar: 'Workspace Security',
+        answers: {
+          'Fully unified': 15,
+          'Managed through separate tools': 5,
+          'Not sure': 0
+        }
+      },
+      q8: {
+        maxScore: 12,
+        pillar: 'Workspace Security',
+        answers: {
+          'Up to 10%': 12,
+          '11%–50%': 8,
+          '51%–80%': 4,
+          'Over 80%': 1
+        }
+      },
+      q9: {
+        maxScore: 15,
+        pillar: 'Workspace Security',
+        answers: {
+          'We do not allow any remote access': 15,
+          'Employees with company managed laptops and/or mobile devices only': 10,
+          'From personal mobile devices': 4,
+          'From personal laptops': 4,
+          'By third parties (contractors, consultants or partners)': 3
+        }
+      },
+      q10: {
+        maxScore: 20,
+        pillar: 'Workspace Security',
+        answers: {
+          'SASE connection (cloud-based service)': 5,
+          'Device risk posture check': 5,
+          'Multi-factor authentication': 5,
+          'VPN connection': 5
+        }
+      },
+      q11: {
+        maxScore: 30,
+        pillar: 'Workspace Security',
+        answers: {
+          'Sanitize potentially malicious downloads': 5,
+          'Real-time scanning of online forms for phishing prevention': 5,
+          'Stop entering corporate credentials to non-business websites': 5,
+          'Restrict access to certain websites (e.g. block access to adult and gambling sites)': 5,
+          'Scan for data leakage': 5,
+          'Prevent access to URLs known as malicious': 5
+        }
+      },
+      q12: {
+        maxScore: 25,
+        pillar: 'Workspace Security',
+        answers: {
+          'Disk encryption on endpoint devices': 5,
+          'Scan files for sensitive content before uploaded to external websites/messaging apps': 5,
+          'Scan content that\'s uploaded in the browser': 5,
+          'Scan email and office applications for sensitive content before it is shared externally': 5,
+          'Permit safe use of Generative AI tools': 5,
+          'I don\'t know': 0
+        }
+      },
+      q13: {
+        maxScore: 12,
+        pillar: 'Workspace Security',
+        answers: {
+          'Office 365 + Google apps + Teams/SharePoint/OneDrive': 12,
+          'Gmail + Google Workspace': 10,
+          'Mixed modern SaaS (Office 365/Google + Zoom/Slack/Dropbox)': 8,
+          'On-premises email (Microsoft Exchange) only': 5,
+          'Other apps only (Zoom/Slack/Dropbox etc.)': 6
+        }
+      },
+      q14: {
+        maxScore: 24,
+        pillar: 'Workspace Security',
+        answers: {
+          'Recover ransomware-encrypted files': 10,
+          'Automatically detect and stop the attack': 7,
+          'Quarantine the infected endpoint': 7,
+          'None of the above': 0
+        }
+      },
+      q15: {
+        maxScore: 45,
+        pillar: 'Workspace Security',
+        answers: {
+          'Endpoint Detection and Response / Extended Detection and Response / Managed Detection and Response (EDR/XDR/MDR)': 6,
+          'Next-Generation Antivirus / Endpoint Protection Platform (NGAV/EPP)': 5,
+          'Cloud-based security services (SASE)': 6,
+          'Email security': 5,
+          'Secure web gateway': 5,
+          'Mobile threat defence': 5,
+          'Endpoint and mobile vulnerability management': 5,
+          'Cloud-based application posture check': 4,
+          'Collaboration apps security': 4
+        }
+      },
+      q16: {
+        maxScore: 20,
+        pillar: 'Workspace Security',
+        answers: {
+          '1–3 vendors': 20,
+          '4–6 vendors': 12,
+          '7–9 vendors': 6,
+          '10+ vendors': 2
+        }
+      },
+      q17: {
+        maxScore: 50,
+        pillar: 'Workspace Security',
+        answers: {
+          'Endpoint Detection and Response (EDR)': 5,
+          'Antivirus / Anti-malware': 5,
+          'Full Disk Encryption + Removable Device Encryption': 5,
+          'Application Control': 5,
+          'Posture Management (vulnerability) with Patch Management': 5,
+          'USB / Peripheral Control': 5,
+          'Browser Security with Content Filtering and Data Loss Prevention': 5,
+          'Mobile Device Management (MDM) + Mobile Device Security': 5,
+          'Local Firewall and Host-based Intrusion Detection System': 5,
+          'Device Policy Configuration and Control': 5
+        }
+      },
+      q18: {
+        maxScore: 50,
+        pillar: 'Cloud Security',
+        answers: {
+          'Cloud Security Posture Management (CSPM)': 5,
+          'Cloud Workload Protection Platform (CWPP)': 5,
+          'Cloud Infrastructure Entitlement Management (CIEM)': 5,
+          'Encryption of Data at Rest and in Transit': 5,
+          'Network Segmentation': 5,
+          'Cloud Firewall': 5,
+          'Cloud Web Application Firewall': 5,
+          'Container Security + Serverless (e.g., image scanning, runtime protection)': 5,
+          'Cloud-Native Application Protection Platform (CNAPP)': 5,
+          'Cloud Access Security Broker (CASB)': 5
+        }
+      },
+      q19: {
+        maxScore: 50,
+        pillar: 'Application Security',
+        answers: {
+          'Web Application Firewall (WAF)': 5,
+          'Static and Dynamic Application Security Testing (SAST/DAST)': 5,
+          'Software Composition Analysis (SCA)': 5,
+          'Secure Software Development Life Cycle Practices': 5,
+          'API Security': 5,
+          'Large Language Model Security': 5,
+          'Code Signing and Integrity Checks': 5,
+          'DevSecOps Integration': 5,
+          'Penetration Testing': 5,
+          'OWASP Top 10 Mitigation': 5
+        }
+      },
+      q20: {
+        maxScore: 50,
+        pillar: 'Email and Collaboration Security',
+        answers: {
+          'Email Security in place': 5,
+          'Phishing Protection and Simulation': 5,
+          'Attachment Sandboxing + Encrypted Attachments': 5,
+          'URL Rewriting and Click Protection': 5,
+          'DMARC, DKIM, SPF Enforcement': 5,
+          'Data Leakage Prevention (DLP) for Email and Collaboration': 5,
+          'Email Encryption': 5,
+          'Collaboration Tool Monitoring (e.g., Teams, Slack)': 5,
+          'Impersonation and Spoofing Detection': 5,
+          'User Awareness Training': 5
+        }
+      },
+      q21: {
+        maxScore: 46,
+        pillar: 'Data Security',
+        answers: {
+          'Data Classification and Labeling': 5,
+          'Data Loss Prevention (DLP)': 5,
+          'Encryption (at rest, in transit, and in use)': 5,
+          'Tokenization and Masking': 5,
+          'Data Access Governance': 1,
+          'Data Discovery and Mapping': 5,
+          'Data Residency and Sovereignty Controls': 5,
+          'Secure Data Disposal': 5,
+          'Privacy Impact Assessments (PIAs)': 5,
+          'User Activity Monitoring on Sensitive Data': 5
+        }
+      },
+      q22: {
+        maxScore: 50,
+        pillar: 'External Risk Management',
+        answers: {
+          'Vendor Risk Assessments': 5,
+          'Continuous Attack Surface Monitoring': 5,
+          'Vulnerability Management + Exposure Validation': 5,
+          'Risk Management': 5,
+          'Dark Web Scanning for Sensitive Information': 5,
+          'Threat Intelligence': 5,
+          'Digital Brand and Risk Protection + Phishing / Social Media': 5,
+          'Third-Party Access Controls': 5,
+          'Continuous Monitoring of Vendors': 5,
+          'Onboarding/Offboarding Procedures': 5
+        }
+      },
+      q23: {
+        maxScore: 50,
+        pillar: 'Identity and Access Management',
+        answers: {
+          'Multi-Factor Authentication (MFA)': 5,
+          'Single Sign-On (SSO)': 5,
+          'Privileged Access Management (PAM)': 5,
+          'Role-Based Access Control (RBAC)': 5,
+          'Just-In-Time (JIT) Access': 5,
+          'Identity Federation and Federation Protocols (SAML, OIDC)': 5,
+          'User Lifecycle Management': 5,
+          'Access Reviews and Recertification': 5,
+          'Password Policy Enforcement': 5,
+          'Behavioral Biometrics / Risk-Based Authentication': 5
+        }
+      },
+      q24: {
+        maxScore: 50,
+        pillar: 'Security Monitoring & Threat Intelligence',
+        answers: {
+          'Security Information and Event Management (SIEM)': 5,
+          'Security Orchestration, Automation and Response (SOAR)': 5,
+          'Threat Intelligence Integration': 5,
+          'User and Entity Behavior Analytics (UEBA)': 5,
+          'Log Aggregation and Retention': 5,
+          'Anomaly Detection': 5,
+          'Deception Technologies': 5,
+          'Threat Hunting Capabilities': 5,
+          'Real-time Alerting and Correlation': 5,
+          'MITRE ATT&CK Mapping': 5
+        }
+      },
+      q25: {
+        maxScore: 50,
+        pillar: 'Incident Response & Recovery',
+        answers: {
+          'Incident Response Plan (IRP)': 5,
+          'Tabletop Exercises and Simulations': 5,
+          'Forensics and Evidence Collection Tools': 5,
+          'Crisis Communication Plan': 5,
+          'Automated Virtual Patching': 5,
+          'Business Continuity Plan (BCP)': 5,
+          'Disaster Recovery Plan (DRP)': 5,
+          'Playbooks for Common Scenarios': 5,
+          'Post-Incident Review Process': 5,
+          'Ransomware Response Protocols': 5
+        }
+      },
+      q26: {
+        maxScore: 50,
+        pillar: 'Security Operations',
+        answers: {
+          'Business Impact Analyses': 5,
+          'Risk Assessments': 5,
+          'Vulnerability Assessments': 5,
+          'Penetration Testing': 5,
+          'Continuous Threat and Exposure Management': 5,
+          'Unified Management': 5,
+          'AI Assisted Security Tools + Management + Detect + Respond': 5,
+          'Open Garden Platform': 5,
+          'Security Operations Center (SOC)': 5,
+          'Shared Indicators of Compromise': 5
+        }
+      }
     };
 
-    // Pillar mapping for aggregation (same as before)
+    // Pillar mapping for aggregation
     const pillarMapping = {
       'Network Security': ['q1', 'q2', 'q3', 'q4', 'q5'],
       'Workspace Security': ['q6', 'q7', 'q8', 'q9', 'q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17'],
@@ -2118,293 +2484,180 @@
       'Security Operations': ['q26']
     };
 
-    // Comprehensive recommendations for all pillars at different maturity levels
+    // Comprehensive recommendations for each pillar based on maturity percentage
     const pillarRecommendations = {
-      'Network Security': {
-        low: [
-          'Implement basic Next-Generation Firewall (NGFW) with intrusion prevention',
-          'Deploy network segmentation to isolate critical assets',
-          'Implement basic DNS and content filtering',
-          'Establish network access control (NAC) for device authentication',
-          'Consider basic VPN for secure remote access'
-        ],
-        medium: [
-          'Enhance NGFW with advanced threat prevention capabilities',
-          'Implement microsegmentation for granular control',
-          'Deploy User Entity Behavior Analytics (UEBA)',
-          'Consider SASE for modern remote access',
-          'Implement network traffic analysis (NTA) for threat detection',
-          'Add deception technologies for early threat detection'
-        ],
-        high: [
-          'Implement full network automation and orchestration',
-          'Deploy AI/ML powered threat detection across network',
-          'Implement Zero Trust Network Access (ZTNA)',
-          'Optimize network performance with SD-WAN integration',
-          'Establish comprehensive network visibility and analytics'
-        ]
-      },
-      'Workspace Security': {
-        low: [
-          'Implement basic endpoint protection (EDR/NGAV)',
-          'Establish device management policies',
-          'Deploy mobile device management (MDM)',
-          'Implement basic remote access security',
-          'Establish vulnerability management process'
-        ],
-        medium: [
-          'Enhance endpoint protection with advanced EDR/XDR',
-          'Implement comprehensive vulnerability management',
-          'Deploy secure web gateway for remote users',
-          'Implement data loss prevention (DLP) for endpoints',
-          'Establish application control policies',
-          'Implement USB and peripheral device control'
-        ],
-        high: [
-          'Implement XDR for cross-layer threat detection',
-          'Deploy advanced threat hunting capabilities',
-          'Implement automated incident response',
-          'Establish unified endpoint security platform',
-          'Implement behavioral biometrics for user verification'
-        ]
-      },
-      'Cloud Security': {
-        low: [
-          'Implement basic cloud security posture management',
-          'Enable encryption for data at rest and in transit',
-          'Implement cloud firewall rules',
-          'Establish cloud access security policies',
-          'Implement basic identity and access management'
-        ],
-        medium: [
-          'Deploy Cloud Workload Protection Platform (CWPP)',
-          'Implement container security scanning',
-          'Enable cloud-native application protection',
-          'Implement cloud infrastructure entitlement management',
-          'Deploy Cloud Access Security Broker (CASB)',
-          'Implement network segmentation in cloud environments'
-        ],
-        high: [
-          'Implement full Cloud-Native Application Protection Platform (CNAPP)',
-          'Deploy advanced CIEM for identity governance',
-          'Implement automated cloud security orchestration',
-          'Establish comprehensive cloud security monitoring',
-          'Implement AI-powered cloud threat detection'
-        ]
-      },
-      'Application Security': {
-        low: [
-          'Implement Web Application Firewall (WAF)',
-          'Establish basic application security testing',
-          'Implement OWASP Top 10 mitigation',
-          'Enable basic API security controls',
-          'Establish secure coding guidelines'
-        ],
-        medium: [
-          'Implement comprehensive SAST/DAST testing',
-          'Integrate security into CI/CD pipelines',
-          'Implement advanced API security controls',
-          'Deploy software composition analysis (SCA)',
-          'Implement runtime application self-protection (RASP)',
-          'Establish DevSecOps practices'
-        ],
-        high: [
-          'Implement advanced application security monitoring',
-          'Deploy AI-powered application security',
-          'Implement comprehensive software supply chain security',
-          'Establish application security orchestration',
-          'Implement automated security testing throughout SDLC'
-        ]
-      },
-      'Email and Collaboration Security': {
-        low: [
-          'Implement basic email security with spam filtering',
-          'Enable basic phishing protection',
-          'Establish email encryption policies',
-          'Implement basic collaboration tool security',
-          'Establish user awareness training'
-        ],
-        medium: [
-          'Deploy advanced phishing simulation and training',
-          'Implement email sandboxing for attachments',
-          'Enable URL rewriting and click protection',
-          'Implement DLP for email and collaboration',
-          'Deploy impersonation detection',
-          'Implement collaboration tool monitoring'
-        ],
-        high: [
-          'Implement AI-powered email threat detection',
-          'Deploy advanced impersonation detection',
-          'Implement real-time collaboration monitoring',
-          'Establish unified email and collaboration security',
-          'Implement comprehensive email encryption and archiving'
-        ]
-      },
-      'Data Security': {
-        low: [
-          'Implement basic data classification framework',
-          'Enable disk encryption on endpoints',
-          'Establish basic data loss prevention',
-          'Implement basic access controls',
-          'Establish data retention policies'
-        ],
-        medium: [
-          'Implement comprehensive data classification and labeling',
-          'Deploy advanced data loss prevention (DLP)',
-          'Implement tokenization and masking',
-          'Establish data access governance',
-          'Implement data discovery and mapping',
-          'Enable data residency controls'
-        ],
-        high: [
-          'Implement AI-powered data security analytics',
-          'Deploy advanced data privacy controls',
-          'Implement comprehensive data governance',
-          'Establish automated data protection',
-          'Implement real-time data activity monitoring'
-        ]
-      },
-      'External Risk Management': {
-        low: [
-          'Establish basic vendor risk assessment process',
-          'Implement vulnerability management',
-          'Establish basic risk management framework',
-          'Implement basic third-party access controls',
-          'Establish onboarding/offboarding procedures'
-        ],
-        medium: [
-          'Implement continuous attack surface monitoring',
-          'Deploy dark web scanning for sensitive information',
-          'Establish comprehensive vendor risk management',
-          'Implement threat intelligence integration',
-          'Deploy digital brand protection',
-          'Implement continuous vendor monitoring'
-        ],
-        high: [
-          'Implement AI-powered external risk analytics',
-          'Deploy advanced threat intelligence platform',
-          'Establish comprehensive risk quantification',
-          'Implement automated risk remediation',
-          'Establish real-time external threat monitoring'
-        ]
-      },
-      'Identity and Access Management': {
-        low: [
-          'Implement Multi-Factor Authentication (MFA)',
-          'Establish basic access control policies',
-          'Implement password policy enforcement',
-          'Establish basic user lifecycle management',
-          'Implement basic privileged access controls'
-        ],
-        medium: [
-          'Implement Single Sign-On (SSO)',
-          'Deploy Privileged Access Management (PAM)',
-          'Establish Role-Based Access Control (RBAC)',
-          'Implement Just-In-Time (JIT) access',
-          'Deploy access reviews and recertification',
-          'Implement identity federation'
-        ],
-        high: [
-          'Implement AI-powered identity analytics',
-          'Deploy behavioral biometrics',
-          'Establish comprehensive identity governance',
-          'Implement zero trust identity framework',
-          'Establish automated identity lifecycle management'
-        ]
-      },
-      'Security Monitoring & Threat Intelligence': {
-        low: [
-          'Implement basic Security Information and Event Management (SIEM)',
-          'Establish log aggregation',
-          'Implement basic alerting',
-          'Establish threat intelligence feeds',
-          'Implement basic anomaly detection'
-        ],
-        medium: [
-          'Implement Security Orchestration, Automation and Response (SOAR)',
-          'Deploy User and Entity Behavior Analytics (UEBA)',
-          'Establish comprehensive threat intelligence',
-          'Implement threat hunting capabilities',
-          'Deploy deception technologies',
-          'Implement MITRE ATT&CK mapping'
-        ],
-        high: [
-          'Implement AI-powered security analytics',
-          'Deploy advanced threat hunting platform',
-          'Establish predictive threat intelligence',
-          'Implement automated threat response',
-          'Establish comprehensive security observability'
-        ]
-      },
-      'Incident Response & Recovery': {
-        low: [
-          'Establish Incident Response Plan (IRP)',
-          'Implement basic forensics capabilities',
-          'Establish crisis communication plan',
-          'Implement basic backup procedures',
-          'Establish disaster recovery plan'
-        ],
-        medium: [
-          'Implement tabletop exercises and simulations',
-          'Deploy automated virtual patching',
-          'Establish business continuity plan',
-          'Implement playbooks for common scenarios',
-          'Deploy ransomware response protocols',
-          'Establish post-incident review process'
-        ],
-        high: [
-          'Implement AI-powered incident response',
-          'Deploy automated incident orchestration',
-          'Establish comprehensive incident simulation',
-          'Implement predictive incident response',
-          'Establish continuous incident readiness'
-        ]
-      },
-      'Security Operations': {
-        low: [
-          'Establish Security Operations Center (SOC)',
-          'Implement basic risk assessments',
-          'Establish vulnerability assessments',
-          'Implement penetration testing',
-          'Establish business impact analyses'
-        ],
-        medium: [
-          'Implement continuous threat and exposure management',
-          'Deploy unified security management',
-          'Establish AI-assisted security tools',
-          'Implement shared indicators of compromise',
-          'Deploy open security platform',
-          'Establish comprehensive security metrics'
-        ],
-        high: [
-          'Implement AI-powered security operations',
-          'Deploy predictive security analytics',
-          'Establish comprehensive security automation',
-          'Implement continuous security optimization',
-          'Establish security operations excellence framework'
-        ]
-      }
+      'Network Security': [
+        { text: 'Implement Next-Generation Firewall (NGFW) with threat prevention capabilities', priority: 'critical', threshold: 20 },
+        { text: 'Deploy Intrusion Prevention Systems (IPS) for real-time threat detection', priority: 'critical', threshold: 30 },
+        { text: 'Implement network segmentation to limit lateral movement of threats', priority: 'high', threshold: 40 },
+        { text: 'Deploy Network Access Control (NAC) for device authentication', priority: 'high', threshold: 50 },
+        { text: 'Implement DNS and web content filtering to block malicious domains', priority: 'medium', threshold: 60 },
+        { text: 'Deploy User Entity Behavior Analytics (UEBA) for anomaly detection', priority: 'medium', threshold: 70 },
+        { text: 'Implement deception technologies (honeypots) for early threat detection', priority: 'low', threshold: 80 },
+        { text: 'Upgrade to SASE (Secure Access Service Edge) for secure remote access', priority: 'low', threshold: 90 },
+        { text: 'Implement Network Traffic Analysis (NTA) for advanced monitoring', priority: 'low', threshold: 95 }
+      ],
+      'Workspace Security': [
+        { text: 'Deploy Endpoint Detection and Response (EDR) solution', priority: 'critical', threshold: 25 },
+        { text: 'Implement Next-Generation Antivirus (NGAV) on all endpoints', priority: 'critical', threshold: 30 },
+        { text: 'Enable full disk encryption on all company devices', priority: 'high', threshold: 40 },
+        { text: 'Implement application control policies to restrict unauthorized software', priority: 'high', threshold: 50 },
+        { text: 'Deploy comprehensive vulnerability management with automated patching', priority: 'medium', threshold: 60 },
+        { text: 'Implement USB and peripheral device control policies', priority: 'medium', threshold: 70 },
+        { text: 'Deploy browser security with content filtering and DLP', priority: 'low', threshold: 80 },
+        { text: 'Implement Mobile Device Management (MDM) for company mobile devices', priority: 'low', threshold: 90 },
+        { text: 'Establish local firewall and host-based IDS on all endpoints', priority: 'low', threshold: 95 }
+      ],
+      'Cloud Security': [
+        { text: 'Implement Cloud Security Posture Management (CSPM) to identify misconfigurations', priority: 'critical', threshold: 20 },
+        { text: 'Deploy Cloud Workload Protection Platform (CWPP) for workload security', priority: 'critical', threshold: 30 },
+        { text: 'Implement Cloud Infrastructure Entitlement Management (CIEM) for access governance', priority: 'high', threshold: 40 },
+        { text: 'Enable encryption for all data at rest and in transit in cloud', priority: 'high', threshold: 50 },
+        { text: 'Implement network segmentation in cloud environments', priority: 'medium', threshold: 60 },
+        { text: 'Deploy cloud-native firewall and web application firewall', priority: 'medium', threshold: 70 },
+        { text: 'Implement container security with image scanning and runtime protection', priority: 'low', threshold: 80 },
+        { text: 'Adopt Cloud-Native Application Protection Platform (CNAPP)', priority: 'low', threshold: 90 },
+        { text: 'Implement Cloud Access Security Broker (CASB) for SaaS applications', priority: 'low', threshold: 95 }
+      ],
+      'Application Security': [
+        { text: 'Implement Web Application Firewall (WAF) to protect web applications', priority: 'critical', threshold: 20 },
+        { text: 'Conduct Static and Dynamic Application Security Testing (SAST/DAST)', priority: 'critical', threshold: 30 },
+        { text: 'Implement Software Composition Analysis (SCA) for third-party libraries', priority: 'high', threshold: 40 },
+        { text: 'Establish Secure Software Development Life Cycle (SDLC) practices', priority: 'high', threshold: 50 },
+        { text: 'Implement API security controls and testing', priority: 'medium', threshold: 60 },
+        { text: 'Develop Large Language Model (LLM) security guidelines', priority: 'medium', threshold: 70 },
+        { text: 'Implement code signing and integrity checks', priority: 'low', threshold: 80 },
+        { text: 'Integrate security into DevOps (DevSecOps)', priority: 'low', threshold: 90 },
+        { text: 'Regular penetration testing and OWASP Top 10 mitigation', priority: 'low', threshold: 95 }
+      ],
+      'Email and Collaboration Security': [
+        { text: 'Implement advanced email security with anti-phishing capabilities', priority: 'critical', threshold: 20 },
+        { text: 'Conduct regular phishing simulation and user awareness training', priority: 'critical', threshold: 30 },
+        { text: 'Deploy attachment sandboxing and encrypted attachments handling', priority: 'high', threshold: 40 },
+        { text: 'Implement URL rewriting and click protection for email links', priority: 'high', threshold: 50 },
+        { text: 'Configure DMARC, DKIM, and SPF for email authentication', priority: 'medium', threshold: 60 },
+        { text: 'Implement Data Loss Prevention (DLP) for email and collaboration tools', priority: 'medium', threshold: 70 },
+        { text: 'Enable email encryption for sensitive communications', priority: 'low', threshold: 80 },
+        { text: 'Monitor collaboration tools (Teams, Slack) for security risks', priority: 'low', threshold: 90 },
+        { text: 'Implement impersonation and spoofing detection mechanisms', priority: 'low', threshold: 95 }
+      ],
+      'Data Security': [
+        { text: 'Implement data classification and labeling framework', priority: 'critical', threshold: 20 },
+        { text: 'Deploy Data Loss Prevention (DLP) solutions', priority: 'critical', threshold: 30 },
+        { text: 'Implement encryption for data at rest, in transit, and in use', priority: 'high', threshold: 40 },
+        { text: 'Apply tokenization and masking for sensitive data', priority: 'high', threshold: 50 },
+        { text: 'Establish data access governance policies', priority: 'medium', threshold: 60 },
+        { text: 'Implement data discovery and mapping tools', priority: 'medium', threshold: 70 },
+        { text: 'Establish data residency and sovereignty controls', priority: 'low', threshold: 80 },
+        { text: 'Implement secure data disposal procedures', priority: 'low', threshold: 90 },
+        { text: 'Conduct Privacy Impact Assessments (PIAs) for new projects', priority: 'low', threshold: 95 }
+      ],
+      'External Risk Management': [
+        { text: 'Implement vendor risk assessment program', priority: 'critical', threshold: 20 },
+        { text: 'Deploy continuous attack surface monitoring', priority: 'critical', threshold: 30 },
+        { text: 'Establish vulnerability management program with exposure validation', priority: 'high', threshold: 40 },
+        { text: 'Implement formal risk management framework', priority: 'high', threshold: 50 },
+        { text: 'Monitor dark web for exposed sensitive information', priority: 'medium', threshold: 60 },
+        { text: 'Subscribe to threat intelligence feeds', priority: 'medium', threshold: 70 },
+        { text: 'Implement digital brand and phishing protection', priority: 'low', threshold: 80 },
+        { text: 'Establish third-party access controls and monitoring', priority: 'low', threshold: 90 },
+        { text: 'Develop comprehensive onboarding/offboarding procedures', priority: 'low', threshold: 95 }
+      ],
+      'Identity and Access Management': [
+        { text: 'Implement Multi-Factor Authentication (MFA) for all users', priority: 'critical', threshold: 20 },
+        { text: 'Deploy Single Sign-On (SSO) for centralized authentication', priority: 'critical', threshold: 30 },
+        { text: 'Implement Privileged Access Management (PAM) solution', priority: 'high', threshold: 40 },
+        { text: 'Establish Role-Based Access Control (RBAC) framework', priority: 'high', threshold: 50 },
+        { text: 'Implement Just-In-Time (JIT) access provisioning', priority: 'medium', threshold: 60 },
+        { text: 'Set up identity federation with SAML/OIDC', priority: 'medium', threshold: 70 },
+        { text: 'Automate user lifecycle management processes', priority: 'low', threshold: 80 },
+        { text: 'Implement regular access reviews and recertification', priority: 'low', threshold: 90 },
+        { text: 'Deploy behavioral biometrics for risk-based authentication', priority: 'low', threshold: 95 }
+      ],
+      'Security Monitoring & Threat Intelligence': [
+        { text: 'Implement Security Information and Event Management (SIEM)', priority: 'critical', threshold: 20 },
+        { text: 'Deploy Security Orchestration, Automation and Response (SOAR)', priority: 'critical', threshold: 30 },
+        { text: 'Integrate threat intelligence feeds into security tools', priority: 'high', threshold: 40 },
+        { text: 'Implement User and Entity Behavior Analytics (UEBA)', priority: 'high', threshold: 50 },
+        { text: 'Establish log aggregation and retention policies', priority: 'medium', threshold: 60 },
+        { text: 'Deploy anomaly detection systems', priority: 'medium', threshold: 70 },
+        { text: 'Implement deception technologies for threat detection', priority: 'low', threshold: 80 },
+        { text: 'Establish threat hunting capabilities', priority: 'low', threshold: 90 },
+        { text: 'Map security events to MITRE ATT&CK framework', priority: 'low', threshold: 95 }
+      ],
+      'Incident Response & Recovery': [
+        { text: 'Develop Incident Response Plan (IRP) with clear procedures', priority: 'critical', threshold: 20 },
+        { text: 'Conduct regular tabletop exercises and simulations', priority: 'critical', threshold: 30 },
+        { text: 'Implement forensics and evidence collection capabilities', priority: 'high', threshold: 40 },
+        { text: 'Develop crisis communication plan', priority: 'high', threshold: 50 },
+        { text: 'Implement automated virtual patching capabilities', priority: 'medium', threshold: 60 },
+        { text: 'Develop Business Continuity Plan (BCP)', priority: 'medium', threshold: 70 },
+        { text: 'Establish Disaster Recovery Plan (DRP) with RTO/RPO', priority: 'low', threshold: 80 },
+        { text: 'Create playbooks for common incident scenarios', priority: 'low', threshold: 90 },
+        { text: 'Implement post-incident review process', priority: 'low', threshold: 95 }
+      ],
+      'Security Operations': [
+        { text: 'Conduct Business Impact Analysis (BIA) for critical systems', priority: 'critical', threshold: 20 },
+        { text: 'Implement regular risk assessment processes', priority: 'critical', threshold: 30 },
+        { text: 'Establish vulnerability assessment program', priority: 'high', threshold: 40 },
+        { text: 'Conduct regular penetration testing', priority: 'high', threshold: 50 },
+        { text: 'Implement continuous threat and exposure management', priority: 'medium', threshold: 60 },
+        { text: 'Deploy unified security management platform', priority: 'medium', threshold: 70 },
+        { text: 'Implement AI-assisted security tools for detection and response', priority: 'low', threshold: 80 },
+        { text: 'Consider open security platform integration', priority: 'low', threshold: 90 },
+        { text: 'Establish or enhance Security Operations Center (SOC)', priority: 'low', threshold: 95 }
+      ]
     };
-
-    // General recommendations that apply to all organizations
-    const generalRecommendations = [
-      'Consider consolidating security vendors to reduce complexity and improve visibility',
-      'Implement a unified security management platform for centralized control',
-      'Conduct regular security awareness training for all employees',
-      'Establish a continuous improvement process for security controls',
-      'Regularly review and update security policies and procedures',
-      'Consider engaging with Check Point for a comprehensive security assessment',
-      'Implement regular security audits and compliance checks',
-      'Establish metrics and KPIs to measure security effectiveness',
-      'Consider managed security services for 24/7 monitoring and response',
-      'Implement regular backup and recovery testing procedures'
-    ];
 
     let currentQuestion = 0;
     const totalQuestions = 26;
     let answers = {};
 
-    // ... (all other functions remain the same until showResultsPage)
+    function startAssessment() {
+      document.getElementById('home').style.display = 'none';
+      document.getElementById('assessment').style.display = 'flex';
+      currentQuestion = 1;
+      document.getElementById('q1').classList.add('active');
+      updateUI();
+    }
+
+    function updateUI() {
+      const isQuestion = currentQuestion >= 1 && currentQuestion <= totalQuestions;
+      document.getElementById('question-bg').classList.toggle('active', isQuestion);
+      document.getElementById('white-bg').classList.toggle('active', !isQuestion);
+      const progress = isQuestion ? (currentQuestion / totalQuestions) * 100 : 0;
+      document.getElementById('question-progress-bar').style.width = progress + '%';
+    }
+
+    function nextQuestion(q) {
+      const box = document.getElementById(`q${q}`);
+      const checked = box.querySelectorAll('input:checked');
+      if (checked.length === 0) {
+        alert("Please select at least one answer before continuing.");
+        return;
+      }
+      let selected = [];
+      checked.forEach(ch => selected.push(ch.closest('.answer').querySelector('.text').textContent.trim()));
+      answers[`q${q}`] = selected;
+      box.classList.remove('active');
+      currentQuestion = q + 1;
+      if (currentQuestion <= totalQuestions) {
+        document.getElementById(`q${currentQuestion}`).classList.add('active');
+      } else {
+        document.getElementById('final').style.display = 'block';
+        setTimeout(() => document.getElementById('progress-bar').style.width = '100%', 100);
+        setTimeout(showResultsPage, 3000);
+      }
+      updateUI();
+    }
+
+    function prevQuestion(q) {
+      if (q <= 1) return;
+      document.getElementById(`q${q}`).classList.remove('active');
+      currentQuestion = q - 1;
+      document.getElementById(`q${currentQuestion}`).classList.add('active');
+      updateUI();
+    }
 
     function showResultsPage() {
       document.getElementById('final').style.display = 'none';
@@ -2424,8 +2677,8 @@
       // Display pillar scores in table
       displayPillarScores(pillarScores);
       
-      // Generate recommendations based on scores
-      generateIntelligentRecommendations(pillarScores, overallScore);
+      // Generate recommendations
+      generateRecommendations(pillarScores, overallScore);
     }
 
     function calculatePillarScores() {
@@ -2492,10 +2745,10 @@
     }
 
     function getMaturityLevel(percentage) {
-      if (percentage >= 85) return 'Advanced Maturity';
-      if (percentage >= 70) return 'Established Maturity';
-      if (percentage >= 50) return 'Developing Maturity';
-      if (percentage >= 30) return 'Initial Maturity';
+      if (percentage >= 90) return 'Advanced Maturity';
+      if (percentage >= 75) return 'Established Maturity';
+      if (percentage >= 60) return 'Developing Maturity';
+      if (percentage >= 40) return 'Initial Maturity';
       return 'Limited Maturity';
     }
 
@@ -2529,138 +2782,159 @@
       return '#D32F2F'; // Red
     }
 
-    function generateIntelligentRecommendations(pillarScores, overallScore) {
-      const container = document.getElementById('recommendations-container');
-      container.innerHTML = '';
+    function generateRecommendations(pillarScores, overallScore) {
+      const recommendationsGrid = document.getElementById('recommendations-grid');
+      const noRecommendationsDiv = document.getElementById('no-recommendations');
+      const recommendationsHeader = document.getElementById('recommendations-header');
       
-      // If overall score is 100%, show congratulations message
+      // Clear previous recommendations
+      recommendationsGrid.innerHTML = '';
+      
+      // Check if overall score is 100%
       if (overallScore === 100) {
-        container.innerHTML = `
-          <div class="no-recommendations">
-            <h3>🎉 Excellent Security Posture!</h3>
-            <p>Your organization has achieved perfect scores across all security pillars. Congratulations on maintaining an exceptional security maturity level!</p>
-            <p>Continue your security excellence by:</p>
-            <ul>
-              <li>Regularly reviewing and updating security controls</li>
-              <li>Staying current with emerging threats and technologies</li>
-              <li>Conducting regular security awareness training</li>
-              <li>Participating in industry security communities</li>
-              <li>Considering Check Point's advanced security solutions for continuous improvement</li>
-            </ul>
-          </div>
-        `;
+        recommendationsHeader.style.display = 'none';
+        recommendationsGrid.style.display = 'none';
+        noRecommendationsDiv.style.display = 'block';
         return;
       }
       
-      // Determine which pillars need recommendations (below 80%)
-      const pillarsNeedingImprovement = Object.keys(pillarScores)
-        .filter(pillar => pillarScores[pillar].percentage < 80)
+      recommendationsHeader.style.display = 'block';
+      recommendationsGrid.style.display = 'grid';
+      noRecommendationsDiv.style.display = 'none';
+      
+      // Sort pillars by percentage (lowest first)
+      const sortedPillars = Object.keys(pillarScores)
         .map(pillar => ({
           name: pillar,
-          percentage: pillarScores[pillar].percentage,
-          level: getPillarLevel(pillarScores[pillar].percentage)
+          percentage: pillarScores[pillar].percentage
         }))
         .sort((a, b) => a.percentage - b.percentage);
       
-      // If no pillars need improvement (all above 80%), show advanced recommendations
-      if (pillarsNeedingImprovement.length === 0) {
-        container.innerHTML = `
-          <div class="recommendations-grid">
-            <div class="recommendation-card">
-              <h4>Advanced Security Optimization</h4>
-              <p>Your organization has strong security foundations. Consider these advanced improvements:</p>
-              <ul>
-                <li>Implement AI-powered security analytics for predictive threat detection</li>
-                <li>Deploy advanced threat hunting capabilities</li>
-                <li>Establish comprehensive security automation and orchestration</li>
-                <li>Implement zero trust architecture across all environments</li>
-                <li>Consider Check Point's Infinity Platform for unified security management</li>
-              </ul>
-            </div>
-            <div class="recommendation-card">
-              <h4>Continuous Improvement</h4>
-              <ul>
-                <li>Establish security metrics and KPIs for continuous measurement</li>
-                <li>Implement regular red team exercises</li>
-                <li>Participate in threat intelligence sharing communities</li>
-                <li>Consider third-party security assessments for external validation</li>
-                <li>Stay current with emerging security technologies and threats</li>
-              </ul>
-            </div>
-          </div>
-        `;
-        return;
+      // Calculate how many pillars to show recommendations for
+      // Lower overall score = more pillars to show
+      let pillarsToShow = 3; // Default
+      
+      if (overallScore < 30) {
+        pillarsToShow = sortedPillars.length; // Show all pillars
+      } else if (overallScore < 50) {
+        pillarsToShow = Math.min(8, sortedPillars.length);
+      } else if (overallScore < 70) {
+        pillarsToShow = Math.min(6, sortedPillars.length);
+      } else if (overallScore < 85) {
+        pillarsToShow = Math.min(4, sortedPillars.length);
       }
       
-      // Create recommendations grid
-      const grid = document.createElement('div');
-      grid.className = 'recommendations-grid';
+      // Get pillars that need improvement (below 80%)
+      const pillarsNeedingImprovement = sortedPillars.filter(pillar => pillar.percentage < 80);
       
-      // Add recommendations for each pillar needing improvement
-      pillarsNeedingImprovement.forEach(pillar => {
-        if (pillarRecommendations[pillar.name] && pillarRecommendations[pillar.name][pillar.level]) {
-          const card = document.createElement('div');
-          card.className = 'recommendation-card';
+      // Show recommendations for pillars needing improvement, up to the calculated limit
+      const pillarsForRecommendations = pillarsNeedingImprovement.slice(0, pillarsToShow);
+      
+      pillarsForRecommendations.forEach(pillar => {
+        const percentage = pillar.percentage;
+        const pillarRecs = pillarRecommendations[pillar.name];
+        
+        if (pillarRecs) {
+          // Filter recommendations based on pillar percentage
+          const applicableRecs = pillarRecs.filter(rec => percentage < rec.threshold);
           
-          // Determine how many recommendations to show based on score
-          const recCount = getRecommendationCount(pillar.percentage);
-          const recommendations = pillarRecommendations[pillar.name][pillar.level].slice(0, recCount);
+          // Calculate how many recommendations to show (more for lower scores)
+          let recsToShow = 3; // Default
           
-          card.innerHTML = `
-            <h4>${pillar.name} (${pillar.percentage}%)</h4>
-            <ul>
-              ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
-            </ul>
-          `;
+          if (percentage < 30) {
+            recsToShow = Math.min(6, applicableRecs.length);
+          } else if (percentage < 50) {
+            recsToShow = Math.min(5, applicableRecs.length);
+          } else if (percentage < 70) {
+            recsToShow = Math.min(4, applicableRecs.length);
+          } else {
+            recsToShow = Math.min(3, applicableRecs.length);
+          }
           
-          grid.appendChild(card);
+          const displayedRecs = applicableRecs.slice(0, recsToShow);
+          
+          if (displayedRecs.length > 0) {
+            const card = document.createElement('div');
+            card.className = 'recommendation-card';
+            
+            // Sort recommendations by priority
+            const priorityOrder = { critical: 1, high: 2, medium: 3, low: 4 };
+            displayedRecs.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+            
+            let recommendationsHTML = `<h4>${pillar.name} <span class="priority-badge priority-${displayedRecs[0].priority}">Priority: ${displayedRecs[0].priority.toUpperCase()}</span></h4>`;
+            recommendationsHTML += `<p><strong>Current Maturity: ${percentage}%</strong></p>`;
+            recommendationsHTML += '<ul>';
+            
+            displayedRecs.forEach(rec => {
+              recommendationsHTML += `<li><span class="priority-indicator priority-${rec.priority}">●</span> ${rec.text}</li>`;
+            });
+            
+            recommendationsHTML += '</ul>';
+            
+            card.innerHTML = recommendationsHTML;
+            recommendationsGrid.appendChild(card);
+          }
         }
       });
       
-      // Add general recommendations card
-      const generalCard = document.createElement('div');
-      generalCard.className = 'recommendation-card';
+      // Add general recommendations if we have space
+      if (pillarsForRecommendations.length < pillarsToShow) {
+        const generalCard = document.createElement('div');
+        generalCard.className = 'recommendation-card';
+        
+        let generalRecs = [
+          'Consider consolidating security vendors for better visibility and management',
+          'Implement a unified security management platform',
+          'Conduct regular security awareness training for all employees',
+          'Establish a continuous improvement process for security controls',
+          'Consider engaging with Check Point for a comprehensive security assessment',
+          'Develop a 3-year cybersecurity roadmap aligned with business objectives'
+        ];
+        
+        // Show more general recommendations for lower scores
+        let generalRecsToShow = 3;
+        if (overallScore < 50) {
+          generalRecsToShow = Math.min(6, generalRecs.length);
+        } else if (overallScore < 70) {
+          generalRecsToShow = Math.min(4, generalRecs.length);
+        }
+        
+        generalRecs = generalRecs.slice(0, generalRecsToShow);
+        
+        generalCard.innerHTML = `
+          <h4>General Recommendations <span class="priority-badge priority-medium">Priority: MEDIUM</span></h4>
+          <ul>
+            ${generalRecs.map(rec => `<li>${rec}</li>`).join('')}
+          </ul>
+        `;
+        
+        recommendationsGrid.appendChild(generalCard);
+      }
       
-      // Determine how many general recommendations to show based on overall score
-      const generalRecCount = getGeneralRecommendationCount(overallScore);
-      const selectedGeneralRecs = generalRecommendations.slice(0, generalRecCount);
-      
-      generalCard.innerHTML = `
-        <h4>General Security Recommendations</h4>
-        <ul>
-          ${selectedGeneralRecs.map(rec => `<li>${rec}</li>`).join('')}
-        </ul>
-      `;
-      
-      grid.appendChild(generalCard);
-      
-      container.appendChild(grid);
-    }
-
-    function getPillarLevel(percentage) {
-      if (percentage < 40) return 'low';
-      if (percentage < 70) return 'medium';
-      return 'high';
-    }
-
-    function getRecommendationCount(percentage) {
-      // Lower scores get more recommendations
-      if (percentage < 30) return 5; // Very low score: 5 recommendations
-      if (percentage < 50) return 4; // Low score: 4 recommendations
-      if (percentage < 70) return 3; // Medium score: 3 recommendations
-      return 2; // High but below 80%: 2 recommendations
-    }
-
-    function getGeneralRecommendationCount(overallScore) {
-      // Lower overall scores get more general recommendations
-      if (overallScore < 30) return 8;
-      if (overallScore < 50) return 6;
-      if (overallScore < 70) return 4;
-      return 3;
+      // If no pillars need improvement but overall score isn't 100%
+      if (pillarsForRecommendations.length === 0 && overallScore < 100) {
+        const congratulationCard = document.createElement('div');
+        congratulationCard.className = 'recommendation-card';
+        congratulationCard.innerHTML = `
+          <h4>🎉 Great Progress!</h4>
+          <p>Your organization has achieved good maturity across all security pillars (above 80%).</p>
+          <p>Consider these next steps:</p>
+          <ul>
+            <li>Focus on advanced threat hunting and proactive defense</li>
+            <li>Implement automation for security operations</li>
+            <li>Consider Zero Trust architecture implementation</li>
+            <li>Engage in purple team exercises</li>
+            <li>Benchmark against industry best practices</li>
+          </ul>
+        `;
+        recommendationsGrid.appendChild(congratulationCard);
+      }
     }
 
     function generatePDF() {
+      // Basic PDF generation implementation
       alert('PDF generation would be implemented here. This would typically use jsPDF or similar library to generate a comprehensive report with all assessment results.');
+      // In production, you would implement full PDF generation with the detailed results
     }
 
     document.addEventListener('DOMContentLoaded', () => {
