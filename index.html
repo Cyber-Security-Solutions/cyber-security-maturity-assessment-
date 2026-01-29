@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -249,7 +250,7 @@
     .progress-border { height: 14px; background: #e0e0e0; border-radius: 7px; margin: 2rem auto; max-width: 440px; overflow: hidden; }
     #progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 2.8s ease-out; }
     
-    /* Results Page Specific Styles */
+    /* Results Page Specific Styles - MOBILE FRIENDLY */
     .results-summary {
       text-align: center;
       margin-bottom: 3rem;
@@ -281,14 +282,16 @@
     .pillars-table th {
       background: var(--primary);
       color: white;
-      padding: 1.2rem;
+      padding: 1.2rem 0.8rem;
       text-align: left;
       font-weight: 600;
+      font-size: 0.9rem;
     }
     
     .pillars-table td {
-      padding: 1rem 1.2rem;
+      padding: 1rem 0.8rem;
       border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
     }
     
     .pillars-table tr:hover {
@@ -352,6 +355,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
     
     .priority-badge {
@@ -359,6 +364,7 @@
       border-radius: 4px;
       font-size: 0.8rem;
       font-weight: 600;
+      white-space: nowrap;
     }
     
     .priority-critical {
@@ -389,6 +395,7 @@
     .recommendation-card li {
       margin-bottom: 0.5rem;
       padding: 0.2rem 0;
+      font-size: 0.95rem;
     }
     
     .download-section {
@@ -421,6 +428,7 @@
     .email-form h3 {
       margin-bottom: 1rem;
       color: var(--primary);
+      font-size: 1.3rem;
     }
     
     .email-form input {
@@ -439,6 +447,7 @@
       border-radius: 5px;
       margin-top: 1rem;
       display: none;
+      text-align: center;
     }
     
     .email-error {
@@ -448,6 +457,7 @@
       border-radius: 5px;
       margin-top: 1rem;
       display: none;
+      text-align: center;
     }
     
     .email-buttons {
@@ -455,6 +465,126 @@
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
+    }
+    
+    /* Mobile responsiveness for tables */
+    @media (max-width: 768px) {
+      .pillars-table {
+        display: block;
+        overflow-x: auto;
+      }
+      
+      .pillars-table th,
+      .pillars-table td {
+        min-width: 120px;
+        padding: 0.8rem 0.5rem;
+      }
+      
+      .pillar-name {
+        min-width: 150px;
+      }
+      
+      .overall-score {
+        font-size: 2.5rem;
+      }
+      
+      .maturity-level {
+        font-size: 1.2rem;
+      }
+      
+      .email-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .email-buttons .button,
+      .email-buttons .pdf-button,
+      .email-buttons .email-button {
+        width: 100%;
+        max-width: 300px;
+      }
+      
+      .q-header {
+        font-size: 1.4rem;
+      }
+      
+      .recommendation-card h4 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      
+      .priority-badge {
+        align-self: flex-start;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .pillars-table th,
+      .pillars-table td {
+        font-size: 0.8rem;
+        padding: 0.6rem 0.4rem;
+      }
+      
+      .overall-score {
+        font-size: 2rem;
+      }
+      
+      .maturity-level {
+        font-size: 1rem;
+      }
+      
+      .email-form {
+        padding: 1.5rem;
+      }
+      
+      .email-form h3 {
+        font-size: 1.1rem;
+      }
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Auto-email notification */
+    .auto-email-notice {
+      background: #e3f2fd;
+      color: #1565c0;
+      padding: 1rem;
+      border-radius: 5px;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+    }
+    
+    /* For very small screens */
+    @media (max-width: 360px) {
+      .button, .pdf-button, .email-button {
+        min-width: 200px;
+        padding: 0.9rem 1.5rem;
+        font-size: 1rem;
+      }
+      
+      .email-form {
+        padding: 1rem;
+      }
+      
+      .recommendation-card {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
@@ -487,7 +617,6 @@
         </div>
       </div>
 
-      <!-- All 26 Questions (keeping all your existing question HTML) -->
       <!-- Question 1 -->
       <div id="q1" class="q-box active" data-num="1">
         <div class="q-header">To what extent are advanced network protections deployed across all sites?</div>
@@ -2134,21 +2263,27 @@
           <div class="maturity-level" id="maturity-level">Calculating...</div>
         </div>
         
+        <div class="auto-email-notice" id="autoEmailNotice">
+          📧 A copy of your assessment results has been sent to our security consultants for review.
+        </div>
+        
         <h3 style="margin: 2rem 0 1rem;">Detailed Assessment Results</h3>
-        <table class="pillars-table" id="pillars-table">
-          <thead>
-            <tr>
-              <th>Security Pillar</th>
-              <th>Your Score</th>
-              <th>Maximum Score</th>
-              <th>Maturity %</th>
-              <th>Progress</th>
-            </tr>
-          </thead>
-          <tbody id="pillars-body">
-            <!-- Will be populated by JavaScript -->
-          </tbody>
-        </table>
+        <div style="overflow-x: auto;">
+          <table class="pillars-table" id="pillars-table">
+            <thead>
+              <tr>
+                <th>Security Pillar</th>
+                <th>Your Score</th>
+                <th>Maximum Score</th>
+                <th>Maturity %</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody id="pillars-body">
+              <!-- Will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
         
         <div class="recommendations">
           <h2 style="text-align:center; margin-bottom:2rem;" id="recommendations-header">Recommendations</h2>
@@ -2180,7 +2315,6 @@
             <button class="button" onclick="retakeAssessment()">Retake Assessment</button>
             <button class="pdf-button" id="pdfBtn" onclick="generatePDF()">Download PDF Report</button>
             <button class="email-button" onclick="sendReportToClient()">Send Me The Report</button>
-            <button class="email-button" style="background: #6c757d;" onclick="sendReportToNadine()">Send to Consultant</button>
           </div>
         </div>
       </div>
@@ -2188,11 +2322,8 @@
   </div>
 
   <script>
-    // EmailJS configuration
-    const EMAILJS_CONFIG = {
-      serviceId: 'service_qg1p66q', // Replace with your EmailJS service ID
-      templateId: 'template_k3f47vl', // Replace with your EmailJS template ID
-      userId: 'MwyEW3n8t2mzSYgqS', // Replace with your EmailJS user ID
+    // Email configuration
+    const EMAIL_CONFIG = {
       nadineEmail: 'nadine@cyberly.co.za'
     };
 
@@ -2545,7 +2676,7 @@
       }
     };
 
-    // Pillar mapping for aggregation
+    // Pillar mapping
     const pillarMapping = {
       'Network Security': ['q1', 'q2', 'q3', 'q4', 'q5'],
       'Workspace Security': ['q6', 'q7', 'q8', 'q9', 'q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17'],
@@ -2559,7 +2690,6 @@
       'Incident Response & Recovery': ['q25'],
       'Security Operations': ['q26']
     };
-
     // Comprehensive recommendations for each pillar based on maturity percentage
     const pillarRecommendations = {
       'Network Security': [
@@ -3195,3 +3325,4 @@
   </script>
 </body>
 </html>
+
