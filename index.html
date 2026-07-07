@@ -230,7 +230,7 @@
     .visible-checkbox {
       display: inline-block !important;
       width: 18px;
-      min-height: 1122px;
+      height: 18px;
       margin-right: 0.5rem;
       vertical-align: middle;
     }
@@ -299,7 +299,7 @@
     }
 
     .contributors-list {
-      max-min-height: 1122px;
+      max-height: 360px;
       overflow-y: auto;
       margin: 1rem 0;
     }
@@ -317,7 +317,7 @@
 
     .round-remove {
       width: 42px;
-      min-height: 1122px;
+      height: 42px;
       border-radius: 50%;
       border: none;
       background: var(--red);
@@ -337,10 +337,10 @@
     }
 
     .progress-track {
-      min-height: 1122px;
+      height: 14px;
       background: #e5e7eb;
       border-radius: 999px;
-      overflow: visible;
+      overflow: hidden;
     }
 
     .progress-fill {
@@ -410,7 +410,7 @@
       border: 2px solid #d1d5db;
       border-radius: 12px;
       padding: 0.9rem 1rem;
-      min-min-height: 1122px;
+      min-height: 64px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -431,7 +431,7 @@
 
     .mark {
       width: 22px;
-      min-height: 1122px;
+      height: 22px;
       border: 2px solid #6b7280;
       background: white;
       flex: 0 0 auto;
@@ -487,7 +487,7 @@
 
     .engineer-notes textarea {
       width: 100%;
-      min-min-height: 1122px;
+      min-height: 90px;
       padding: 0.8rem;
       border: 1px solid #fed7aa;
       border-radius: 10px;
@@ -619,10 +619,10 @@
     .score-bar-container {
       display: inline-block;
       width: 130px;
-      min-height: 1122px;
+      height: 16px;
       background: #e5e7eb;
       border-radius: 999px;
-      overflow: visible;
+      overflow: hidden;
     }
 
     .score-bar {
@@ -780,10 +780,10 @@
 
     .pdf-progress-bar {
       width: 120px;
-      min-height: 1122px;
+      height: 15px;
       background: #e5e7eb;
       border-radius: 999px;
-      overflow: visible;
+      overflow: hidden;
     }
 
     .pdf-progress-fill {
@@ -2581,31 +2581,222 @@
     async function generatePDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p', 'mm', 'a4');
+
       const pdfBtn = document.getElementById('pdfBtn');
       const originalText = pdfBtn.textContent;
-      const today = new Date().toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-      });
-
       pdfBtn.textContent = 'Generating PDF...';
       pdfBtn.disabled = true;
 
       try {
-        preparePDFPages(today);
+        const margin = 15;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const usableWidth = pageWidth - (margin * 2);
+        let y = margin;
 
-        const pageIds = ['pdf-page-1', 'pdf-page-2', 'pdf-page-3'];
-        const imgWidth = 190;
+        const today = new Date().toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        });
 
-        for (let index = 0; index < pageIds.length; index++) {
-          if (index > 0) doc.addPage();
-          const page = document.getElementById(pageIds[index]);
-          const canvas = await html2canvas(page, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-          const imgData = canvas.toDataURL('image/jpeg', 1.0);
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-          doc.addImage(imgData, 'JPEG', 10, 10, imgWidth, imgHeight);
+        const allPageNumbers = [];
+
+        function header() {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(16);
+          doc.setTextColor(0, 85, 165);
+          doc.text('Your Cyber Security Journey Report', margin, 14);
+          doc.setDrawColor(0, 85, 165);
+          doc.line(margin, 18, pageWidth - margin, 18);
+          y = 26;
         }
+
+        function footer() {
+          const pageNo = doc.internal.getNumberOfPages();
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(100, 100, 100);
+          doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+          doc.text(`Confidential Report | Generated on ${today} | Page ${pageNo}`, margin, pageHeight - 8);
+        }
+
+        function addPage() {
+          footer();
+          doc.addPage();
+          header();
+        }
+
+        function ensureSpace(requiredHeight) {
+          if (y + requiredHeight > pageHeight - 22) {
+            addPage();
+          }
+        }
+
+        function addHeading(text) {
+          ensureSpace(12);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(13);
+          doc.setTextColor(0, 85, 165);
+          doc.text(text, margin, y);
+          y += 8;
+        }
+
+        function addSubHeading(text) {
+          ensureSpace(10);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(11);
+          doc.setTextColor(0, 85, 165);
+          const lines = doc.splitTextToSize(text, usableWidth);
+          lines.forEach(line => {
+            ensureSpace(6);
+            doc.text(line, margin, y);
+            y += 5.5;
+          });
+        }
+
+        function addParagraph(text, options = {}) {
+          const fontSize = options.fontSize || 10;
+          const lineHeight = options.lineHeight || 5.2;
+          const indent = options.indent || 0;
+          const width = usableWidth - indent;
+          doc.setFont('helvetica', options.bold ? 'bold' : 'normal');
+          doc.setFontSize(fontSize);
+          doc.setTextColor(options.color || 30, options.color || 30, options.color || 30);
+          const lines = doc.splitTextToSize(String(text || ''), width);
+          lines.forEach(line => {
+            ensureSpace(lineHeight + 1);
+            doc.text(line, margin + indent, y);
+            y += lineHeight;
+          });
+          y += options.after || 2;
+        }
+
+        function addBullet(text) {
+          const bulletIndent = 5;
+          const textIndent = 8;
+          const lines = doc.splitTextToSize(String(text || ''), usableWidth - textIndent);
+          ensureSpace(6);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(35, 35, 35);
+          doc.text('•', margin + bulletIndent, y);
+          doc.text(lines[0], margin + textIndent, y);
+          y += 5;
+          for (let i = 1; i < lines.length; i++) {
+            ensureSpace(6);
+            doc.text(lines[i], margin + textIndent, y);
+            y += 5;
+          }
+        }
+
+        function scoreColour(score) {
+          if (score >= 80) return [46, 125, 50];
+          if (score >= 60) return [255, 152, 0];
+          return [211, 47, 47];
+        }
+
+        header();
+
+        // Executive summary
+        addHeading('Overall Cyber Security Journey Score');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(30);
+        doc.setTextColor(0, 85, 165);
+        doc.text(`${overallScore}%`, margin, y + 4);
+        y += 14;
+
+        doc.setFontSize(14);
+        doc.setTextColor(60, 60, 60);
+        doc.text(getMaturityLevel(overallScore), margin, y);
+        y += 10;
+
+        addParagraph(
+          "This report summarises your organisation's current cyber security posture based on your responses to the Cyber Security Journey assessment. It highlights your strengths, identifies areas for improvement, and provides practical recommendations to help you progress towards a more resilient and secure environment.",
+          { after: 4 }
+        );
+
+        // Contributors
+        addHeading('Assessment Contributors');
+        if (contributors && contributors.length) {
+          contributors.forEach(c => {
+            const name = c.fullName || c || 'Contributor';
+            const company = c.companyName ? ` — ${c.companyName}` : '';
+            addBullet(`${name}${company}`);
+          });
+        } else {
+          addParagraph('No contributors captured.');
+        }
+
+        y += 4;
+
+        // Domain scores
+        addHeading('Cyber Security Maturity by Security Domain');
+
+        mainPillars.forEach(pillar => {
+          const item = pillarScores[pillar];
+          if (!item) return;
+          ensureSpace(10);
+          const [r, g, b] = scoreColour(item.percentage);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.setTextColor(0, 85, 165);
+          doc.text(pillar, margin, y);
+
+          doc.setTextColor(30, 30, 30);
+          doc.text(`${item.percentage}%`, pageWidth - margin - 18, y);
+
+          y += 3;
+          doc.setFillColor(230, 230, 230);
+          doc.roundedRect(margin, y, usableWidth, 4, 2, 2, 'F');
+          doc.setFillColor(r, g, b);
+          doc.roundedRect(margin, y, usableWidth * (item.percentage / 100), 4, 2, 2, 'F');
+          y += 9;
+        });
+
+        // Recommendations
+        addPage();
+        addHeading('Recommended Improvement Actions');
+
+        const recommendationCards = [...document.querySelectorAll('#recommendations-grid .recommendation-card')];
+        if (recommendationCards.length) {
+          recommendationCards.forEach(card => {
+            const heading = card.querySelector('h3, h4')?.textContent?.trim() || 'Recommended Actions';
+            addSubHeading(heading);
+            const items = [...card.querySelectorAll('li')].map(li => li.textContent.trim()).filter(Boolean);
+            if (items.length) {
+              items.forEach(addBullet);
+            } else {
+              addParagraph(card.textContent.trim());
+            }
+            y += 3;
+          });
+        } else {
+          addParagraph('Continue to monitor and improve your cyber security controls across people, process and technology.');
+        }
+
+        // Engineer notes: dynamically continues over as many pages as required
+        addPage();
+        addHeading('Engineer Notes & Observations');
+
+        const notes = questions
+          .map(q => ({
+            question: q,
+            note: engineerNotes[`q${q.id}_note`] || answers[`q${q.id}_note`] || ''
+          }))
+          .filter(item => item.note && String(item.note).trim());
+
+        if (notes.length) {
+          notes.forEach(item => {
+            addSubHeading(`Question ${item.question.id}: ${item.question.title}`);
+            addParagraph(String(item.note), { after: 4 });
+          });
+        } else {
+          addParagraph('No engineer notes were captured for this assessment.');
+        }
+
+        footer();
 
         doc.save(`Your_Cyber_Security_Journey_Report_${new Date().toISOString().slice(0,10)}.pdf`);
       } catch (error) {
@@ -2632,20 +2823,3 @@
   </script>
 </body>
 </html>
-
-<style>
-@media print{
-  .pdf-page{
-    page-break-after:always;
-    break-after:page;
-    overflow:visible !important;
-    min-height:1122px;
-  }
-  .pdf-section,
-  .question-block,
-  .engineer-note{
-    page-break-inside:auto;
-    break-inside:auto;
-  }
-}
-</style>
