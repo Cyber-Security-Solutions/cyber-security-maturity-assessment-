@@ -144,6 +144,7 @@
 
     .password-container {
       position: relative;
+      margin-bottom: 1rem;
     }
 
     .password-container .input {
@@ -233,21 +234,6 @@
       height: 18px;
       margin-right: 0.5rem;
       vertical-align: middle;
-    }
-
-    .privacy-consent {
-      text-align: left;
-      background: #f9fafb;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem;
-      margin: 0.5rem 0 1rem;
-      color: #374151;
-      font-size: 0.9rem;
-    }
-
-    .privacy-consent strong {
-      color: var(--primary);
     }
 
     .message {
@@ -874,16 +860,6 @@
         <div class="password-container">
           <input type="password" id="signup-confirm" class="input" placeholder="Confirm Password *" />
           <i class="password-toggle fas fa-eye" onclick="togglePassword('signup-confirm', this)"></i>
-        </div>
-
-        <div class="privacy-consent">
-          <strong>Privacy Notice:</strong>
-          By creating an account and completing this assessment, you consent to the secure storage of your profile information, assessment responses, contributor details, company details and engineer notes for reporting and historical comparison purposes. Your information will not be shared with third parties and will only be used to provide assessment results and related communications.
-          <br /><br />
-          <label>
-            <input type="checkbox" id="privacy-consent" class="visible-checkbox" />
-            I have read and agree to the Privacy Notice.
-          </label>
         </div>
 
         <button class="button full" onclick="signup()">Sign Up</button>
@@ -1792,15 +1768,8 @@
       const phone = document.getElementById('signup-phone').value.trim();
       const password = document.getElementById('signup-password').value;
       const confirm = document.getElementById('signup-confirm').value;
-      const consent = document.getElementById('privacy-consent').checked;
-
       if (!firstName || !lastName || !company || !email || !password || !confirm) {
         showMessage('signup-error', 'Please fill in all required fields.');
-        return;
-      }
-
-      if (!consent) {
-        showMessage('signup-error', 'Please confirm that you have read and agree to the Privacy Notice.');
         return;
       }
 
@@ -1821,9 +1790,7 @@
           company_name: company,
           email: email,
           phone_number: phone || null,
-          password: password,
-          privacy_consent: true,
-          privacy_consent_at: new Date().toISOString()
+          password: password
         }]);
 
         if (error) throw error;
