@@ -822,9 +822,9 @@
         <h2>Login</h2>
         <p>Enter your credentials to access your cyber security maturity assessment.</p>
 
-        <input type="email" id="login-email" class="input" placeholder="Email" required />
+        <input type="email" id="login-email" name="email" class="input" placeholder="Email" autocomplete="username" required />
         <div class="password-container">
-          <input type="password" id="login-password" class="input" placeholder="Password" required />
+          <input type="password" id="login-password" name="password" class="input" placeholder="Password" autocomplete="current-password" required />
           <i class="password-toggle fas fa-eye" onclick="togglePassword('login-password', this)"></i>
         </div>
 
@@ -850,15 +850,15 @@
         </div>
         <input type="text" id="signup-company" class="input" placeholder="Company Name *" />
         <div class="input-row">
-          <input type="email" id="signup-email" class="input" placeholder="Email *" />
+          <input type="email" id="signup-email" name="email" class="input" placeholder="Email *" autocomplete="email" />
           <input type="tel" id="signup-phone" class="input" placeholder="Phone Number" />
         </div>
         <div class="password-container">
-          <input type="password" id="signup-password" class="input" placeholder="Password *" />
+          <input type="password" id="signup-password" name="new-password" class="input" placeholder="Password *" autocomplete="new-password" />
           <i class="password-toggle fas fa-eye" onclick="togglePassword('signup-password', this)"></i>
         </div>
         <div class="password-container">
-          <input type="password" id="signup-confirm" class="input" placeholder="Confirm Password *" />
+          <input type="password" id="signup-confirm" name="confirm-password" class="input" placeholder="Confirm Password *" autocomplete="new-password" />
           <i class="password-toggle fas fa-eye" onclick="togglePassword('signup-confirm', this)"></i>
         </div>
 
@@ -890,11 +890,11 @@
       <h2>Set New Password</h2>
       <p>Enter your new password below.</p>
       <div class="password-container">
-        <input type="password" id="new-password" class="input" placeholder="New password *" required />
+        <input type="password" id="new-password" name="new-password" class="input" placeholder="New password *" autocomplete="new-password" required />
         <i class="password-toggle fas fa-eye" onclick="togglePassword('new-password', this)"></i>
       </div>
       <div class="password-container">
-        <input type="password" id="confirm-password" class="input" placeholder="Confirm new password *" required />
+        <input type="password" id="confirm-password" name="confirm-password" class="input" placeholder="Confirm new password *" autocomplete="new-password" required />
         <i class="password-toggle fas fa-eye" onclick="togglePassword('confirm-password', this)"></i>
       </div>
       <button class="button full" onclick="updatePassword()">Update Password</button>
@@ -1778,8 +1778,21 @@
         return;
       }
 
-      if (password.length < 6) {
-        showMessage('signup-error', 'Password must be at least 6 characters.');
+      if (password.length < 10) {
+        showMessage('signup-error', 'Password must be at least 10 characters.');
+        return;
+      }
+
+      const hasUppercase = /[A-Z]/.test(password);
+      const hasLowercase = /[a-z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+      if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+        showMessage(
+          'signup-error',
+          'Password must include an uppercase letter, lowercase letter, number and special character.'
+        );
         return;
       }
 
@@ -1885,8 +1898,21 @@
         return;
       }
 
-      if (newPassword.length < 6) {
-        showMessage('update-error', 'Password must be at least 6 characters.');
+      if (newPassword.length < 10) {
+        showMessage('update-error', 'Password must be at least 10 characters.');
+        return;
+      }
+
+      const hasUppercase = /[A-Z]/.test(newPassword);
+      const hasLowercase = /[a-z]/.test(newPassword);
+      const hasNumber = /\d/.test(newPassword);
+      const hasSpecial = /[^A-Za-z0-9]/.test(newPassword);
+
+      if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+        showMessage(
+          'update-error',
+          'Password must include an uppercase letter, lowercase letter, number and special character.'
+        );
         return;
       }
 
